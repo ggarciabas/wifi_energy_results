@@ -425,7 +425,7 @@ void TestBed::ConfigureScenario ()
   deviceModelsWifi.Get(0)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&TestBed::TotalEnergyConsumptionTrace,  this));
 
   // configure cli
-  m_cli.Create(5);
+  m_cli.Create(20);
   // configurando devices
   NetDeviceContainer dev  = wifiHelper.Install(phyHelperCli, macWifiHelperCli, m_cli);
   // configurando internet
