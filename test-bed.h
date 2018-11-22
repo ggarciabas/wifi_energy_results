@@ -86,6 +86,8 @@ private:
 
   std::string m_protocolName;
 
+  EnergySourceContainer m_sources;
+
 };
 
 }

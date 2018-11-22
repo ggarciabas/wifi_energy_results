@@ -21,6 +21,7 @@
 #include "ns3/log.h"
 #include "uav-energy-source-helper.h"
 #include "uav-energy-source.h"
+#include "ns3/energy-module.h"
 #include "ns3/simulator.h"
 #include "ns3/wifi-radio-energy-model-helper.h"
 #include "ns3/wifi-radio-energy-model.h"
@@ -378,18 +379,18 @@ void TestBed::ConfigureScenario ()
 
   // energia somente em um UAV
   /* Mine energy source */
-  UavEnergySourceHelper sourceHelper;
-  sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
-  sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(m_initialEnergyJ)); // Joules
-  EnergySourceContainer sources = sourceHelper.Install(m_uavs.Get(0)); // install source
-  // DynamicCast<UavEnergySource>(sources.Get(0))->Start(); --- not used in this simulation
+  // UavEnergySourceHelper sourceHelper;
+  // sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  // sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(m_initialEnergyJ)); // Joules
+  // sources = sourceHelper.Install(m_uavs.Get(0)); // install source
+  //// DynamicCast<UavEnergySource>(sources.Get(0))->Start(); --- not used in this simulation
 
   // Energy sources
-  // EnergySourceContainer sources;
-  // BasicEnergySourceHelper basicSourceHelper;
-  // basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (m_initialEnergyJ));
-  // basicSourceHelper.Set ("BasicEnergySupplyVoltageV", DoubleValue (3.3));
-  // sources = basicSourceHelper.Install(m_uavs.Get(0));
+  EnergySourceContainer sources;
+  BasicEnergySourceHelper basicSourceHelper;
+  basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (m_initialEnergyJ));
+  basicSourceHelper.Set ("BasicEnergySupplyVoltageV", DoubleValue (3.3));
+  sources = basicSourceHelper.Install(m_uavs.Get(0));
 
   /* device energy model */
   WifiRadioEnergyModelHelper radioEnergyHelper;
@@ -424,7 +425,7 @@ void TestBed::ConfigureScenario ()
   deviceModelsWifi.Get(0)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&TestBed::TotalEnergyConsumptionTrace,  this));
 
   // configure cli
-  m_cli.Create(20);
+  m_cli.Create(5);
   // configurando devices
   NetDeviceContainer dev  = wifiHelper.Install(phyHelperCli, macWifiHelperCli, m_cli);
   // configurando internet
