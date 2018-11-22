@@ -377,12 +377,12 @@ void TestBed::ConfigureScenario ()
   }
 
   // energia somente em um UAV
-  /* energy source */
+  /* Mine energy source */
   UavEnergySourceHelper sourceHelper;
   sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
   sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(m_initialEnergyJ)); // Joules
   EnergySourceContainer sources = sourceHelper.Install(m_uavs.Get(0)); // install source
-  DynamicCast<UavEnergySource>(sources.Get(0))->Start();
+  // DynamicCast<UavEnergySource>(sources.Get(0))->Start(); --- not used in this simulation
 
   // Energy sources
   // EnergySourceContainer sources;

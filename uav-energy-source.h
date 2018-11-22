@@ -110,9 +110,9 @@ public:
    */
   Time GetEnergyUpdateInterval (void) const;
 
-  void Reset ();
+  // void Reset ();
   void Stop (); // stop, UAV fora da rede
-  void Start (); // para iniciar o posicionamento
+  // void Start (); // para iniciar o posicionamento
 
 private:
   /// Defined in ns3::Object
@@ -154,7 +154,7 @@ private:
                                          // set to false again when the remaining energy exceeds the high threshold
   TracedValue<double> m_remainingEnergyJ; // remaining energy, in mAs
   EventId m_energyUpdateEvent;           // energy update event
-  Vector m_lastPosition;                 // last position of the node
+  // Vector m_lastPosition;                 // last position of the node
   Time m_lastUpdateTime;                  // last update time
   Time m_energyUpdateInterval;           // energy update interval
   std::ofstream m_file;

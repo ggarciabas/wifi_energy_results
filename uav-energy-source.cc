@@ -76,7 +76,7 @@ UavEnergySource::GetTypeId(void)
                                        MakeStringAccessor(&UavEnergySource::m_scenarioName),
                                        MakeStringChecker())
                          .AddTraceSource("RemainingEnergy",
-                                          "Remaining energy at UavEnergySource (miliamperesecond - mAs).",
+                                          "Remaining energy at UavEnergySource.",
                                           MakeTraceSourceAccessor(&UavEnergySource::m_remainingEnergyJ),
                                           "ns3::TracedValueCallback::Double");
   return tid;
@@ -95,21 +95,21 @@ UavEnergySource::~UavEnergySource()
   NS_LOG_FUNCTION(this);
 }
 
-void UavEnergySource::Reset () {
-  NS_ASSERT(m_node != NULL);
-  m_lastUpdateTime = Simulator::Now();
-  m_depleted = false;
-  m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
-  m_remainingEnergyJ = m_initialEnergyJ;
-  NotifyEnergyRecharged();
-}
-
-void UavEnergySource::Start () {
-  NS_ASSERT(m_node != NULL);
-  Ptr<MobilityModel> mob = m_node->GetObject<MobilityModel>();
-  NS_ASSERT(mob != NULL);
-  m_lastPosition = mob->GetPosition();
-}
+// void UavEnergySource::Reset () {
+//   NS_ASSERT(m_node != NULL);
+//   m_lastUpdateTime = Simulator::Now();
+//   m_depleted = false;
+//   m_lastPosition = m_node->GetObject<MobilityModel>()->GetPosition();
+//   m_remainingEnergyJ = m_initialEnergyJ;
+//   NotifyEnergyRecharged();
+// }
+//
+// void UavEnergySource::Start () {
+//   NS_ASSERT(m_node != NULL);
+//   Ptr<MobilityModel> mob = m_node->GetObject<MobilityModel>();
+//   NS_ASSERT(mob != NULL);
+//   m_lastPosition = mob->GetPosition();
+// }
 
 void UavEnergySource::Stop () {
   m_depleted = true;
