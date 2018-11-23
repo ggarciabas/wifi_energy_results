@@ -78,6 +78,8 @@ TestBed::TestBed()
   NS_LOG_FUNCTION(this);
   m_meanConsumptionAdhoc = 0.0;
   m_meanConsumption = 0.0;
+  m_meanConsumption2 = 0.0;
+  m_countConsumption2 = 0;
   m_countTx = 0;
   m_countRx = 0;
   m_consAdhoc = 0;
@@ -142,7 +144,7 @@ void TestBed::Run () {
   os << "./scratch/wifi_energy_results/data/output/" << m_scenarioName << "/" << m_protocolName << "/" << m_seed << "/final.txt";
   std::ofstream file;
   file.open(os.str(), std::ofstream::out | std::ofstream::app);
-  file << m_countTx << "," << m_countRx << "\n" << m_meanConsumption << "," << m_meanConsumptionAdhoc << "\n";
+  file << m_countTx << "," << m_countRx << "\n" << m_meanConsumption << "," << m_meanConsumptionAdhoc << "," << m_meanConsumption/(double)m_countConsumption2 << "\n";
   file.close();
 
   os.str("");
@@ -379,17 +381,18 @@ void TestBed::ConfigureScenario ()
 
   // energia somente em um UAV
   /* Mine energy source */
+  EnergySourceContainer sources;
   UavEnergySourceHelper sourceHelper;
   sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
   sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(m_initialEnergyJ)); // Joules
-  m_sources = sourceHelper.Install(m_uavs.Get(0)); // install source
-  // DynamicCast<UavEnergySource>(m_sources.Get(0))->Start(); --- not used in this simulation
+  sources = sourceHelper.Install(m_uavs.Get(0)); // install source
+  // DynamicCast<UavEnergySource>(sources.Get(0))->Start(); --- not used in this simulation
 
   // Energy sources
   // BasicEnergySourceHelper basicSourceHelper;
   // basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (m_initialEnergyJ));
   // basicSourceHelper.Set ("BasicEnergySupplyVoltageV", DoubleValue (3.3));
-  // m_sources = basicSourceHelper.Install(m_uavs.Get(0));
+  // sources = basicSourceHelper.Install(m_uavs.Get(0));
 
   /* device energy model */
   WifiRadioEnergyModelHelper radioEnergyHelper;
@@ -407,7 +410,7 @@ void TestBed::ConfigureScenario ()
   radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.38787878788)); // Ampere - Tx 1.28W
   radioEnergyHelper.Set ("RxCurrentA", DoubleValue (0.28484848485)); // Ampere - Rx 0.94W
   radioEnergyHelper.SetDepletionCallback (MakeCallback(&TestBed::WifiRadioEnergyDepletionCallback, this));
-  DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi.Get(0), m_sources);
+  DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi.Get(0), sources);
 
   // ADHOC -- http://www.mwnl.snu.ac.kr/~schoi/publication/Conferences/15-SECON-LEE.pdf [1 antena]
   radioEnergyHelper.Set ("IdleCurrentA", DoubleValue (0.18181818182)); // Ampere - (17dBm 40MHz) Idle 0.6W
@@ -417,7 +420,7 @@ void TestBed::ConfigureScenario ()
   radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.45454545455)); // Ampere - Tx 1.5W
   radioEnergyHelper.Set ("RxCurrentA", DoubleValue (0.25757575758)); // Ampere - Rx 0.85W
   // install device model
-  DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhocUav.Get(0), m_sources);
+  DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhocUav.Get(0), sources);
 
   // Configure TotalEnergyConsumption
   deviceModelsAdhoc.Get(0)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&TestBed::TotalEnergyConsumptionTraceAdhoc,  this));
@@ -566,7 +569,11 @@ TestBed::TotalEnergyConsumptionTrace (double oldV, double newV)
   NS_LOG_FUNCTION(this);
   // GetInitialEnergy
   m_meanConsumption += (newV - oldV);
+  m_meanConsumption2 += (newV - oldV);
+  m_countConsumption2++;
   m_meanConsumption /= 2.0;
+
+  NS_LOG_DEBUG("Consumo real: " << (newV - oldV) << " MC: " << m_meanConsumption << " MC2: " << m_meanConsumption2/(double)m_countConsumption2);
 
   m_consWifi += (newV - oldV);
   m_consCrescWifi = newV;

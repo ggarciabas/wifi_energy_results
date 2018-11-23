@@ -69,6 +69,8 @@ private:
 
   double m_meanConsumptionAdhoc;
   double m_meanConsumption;
+  double m_meanConsumption2;
+  int m_countConsumption2;
 
   double m_consAdhoc, m_consCrescAdhoc;
   double m_consWifi, m_consCrescWifi;
@@ -85,8 +87,6 @@ private:
   int m_countRx;
 
   std::string m_protocolName;
-
-  EnergySourceContainer m_sources;
 
 };
 

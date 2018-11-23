@@ -11,8 +11,6 @@ import sys
 from matplotlib import colors as mcolors
 colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
-# def read_battery (main_path, teste, protocol, seed, type): GENERAL com todos os valores !
-
 def read_battery (main_path, teste, scenario, protocol, seeds, type):
     columns = ["Dispositivo", "Tempo", "Consumo (J)"]
     adhoc = []
@@ -50,13 +48,13 @@ def read_battery (main_path, teste, scenario, protocol, seeds, type):
 
     df = pd.DataFrame(data=data, columns=np.array(columns))
     return df
-
 def grafico_bateria (main_path, teste, scenario, protocol, type, df):
     plt.clf()
     ax = sns.boxplot(x="Tempo", y="Consumo (J)", hue="Dispositivo", data=df, palette="Set1", showfliers=False)
     plt.setp(ax.get_xticklabels(), rotation=45, fontsize=7)
     plt.title(u"Comparação do consumo por tempo e dispositivo")
-
+    if type == "atual":
+        plt.ylim(top=15)
     plt.savefig(main_path+scenario+'/consumo_'+type+'_'+protocol+'.svg')
     plt.savefig(main_path+scenario+'/consumo_'+type+'_'+protocol+'.png')
     plt.savefig(main_path+scenario+'/consumo_'+type+'_'+protocol+'.eps')
@@ -65,12 +63,11 @@ def grafico_bateria (main_path, teste, scenario, protocol, type, df):
     ax = sns.boxplot(x="Tempo", y="Consumo (J)", hue="Dispositivo", data=df, palette="Set1")
     plt.setp(ax.get_xticklabels(), rotation=45, fontsize=7)
     plt.title(u"Comparação do consumo por tempo e dispositivo")
-
+    if type == "atual":
+        plt.ylim(top=15)
     plt.savefig(main_path+scenario+'/consumo_out_'+type+'_'+protocol+'.svg')
     plt.savefig(main_path+scenario+'/consumo_out_'+type+'_'+protocol+'.png')
     plt.savefig(main_path+scenario+'/consumo_out_'+type+'_'+protocol+'.eps')
-
-# ---- battery
 
 def read_pacote (main_path, teste, scenario, protocols, seeds):
     columns = ["Protocolo", "Estado", "Quantidade de pacotes"]
@@ -105,7 +102,6 @@ def read_pacote (main_path, teste, scenario, protocols, seeds):
 
     df = pd.DataFrame(data=data, index=lines, columns=np.array(columns))
     return df
-
 def grafico_pacote (main_path, teste, scenario, protocols, df):
     plt.clf()
     # Grouped boxplot
@@ -157,7 +153,6 @@ def read_consumption (main_path, teste, scenario, protocols, seeds):
 
     df = pd.DataFrame(data=data, index=lines, columns=np.array(columns))
     return df
-
 def grafico_consumption (main_path, teste, scenario, protocols, df):
     plt.clf()
     # Grouped boxplot
@@ -174,8 +169,6 @@ def grafico_consumption (main_path, teste, scenario, protocols, df):
     plt.savefig(main_path+scenario+'/consumo_out.svg')
     plt.savefig(main_path+scenario+'/consumo_out.png')
     plt.savefig(main_path+scenario+'/consumo_out.eps')
-
-# ----- final
 
 # ------------------------ MAIN
 teste = False

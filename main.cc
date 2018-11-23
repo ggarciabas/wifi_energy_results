@@ -39,6 +39,7 @@ int main (int argc, char *argv[])
 		LogComponentEnable("TestBed", LOG_DEBUG);
 		// LogComponentEnable("DhcpHelper", LOG_ALL);
   }
+	
   ObjectFactory obj;
 	obj.SetTypeId("ns3::TestBed");
 	obj.Set("SimulationTime", DoubleValue(sim_time));
