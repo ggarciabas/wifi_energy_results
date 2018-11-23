@@ -379,18 +379,17 @@ void TestBed::ConfigureScenario ()
 
   // energia somente em um UAV
   /* Mine energy source */
-  // UavEnergySourceHelper sourceHelper;
-  // sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
-  // sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(m_initialEnergyJ)); // Joules
-  // sources = sourceHelper.Install(m_uavs.Get(0)); // install source
-  //// DynamicCast<UavEnergySource>(sources.Get(0))->Start(); --- not used in this simulation
+  UavEnergySourceHelper sourceHelper;
+  sourceHelper.Set("ScenarioName", StringValue(m_scenarioName));
+  sourceHelper.Set("UavEnergySourceInitialEnergy", DoubleValue(m_initialEnergyJ)); // Joules
+  m_sources = sourceHelper.Install(m_uavs.Get(0)); // install source
+  // DynamicCast<UavEnergySource>(m_sources.Get(0))->Start(); --- not used in this simulation
 
   // Energy sources
-  EnergySourceContainer sources;
-  BasicEnergySourceHelper basicSourceHelper;
-  basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (m_initialEnergyJ));
-  basicSourceHelper.Set ("BasicEnergySupplyVoltageV", DoubleValue (3.3));
-  sources = basicSourceHelper.Install(m_uavs.Get(0));
+  // BasicEnergySourceHelper basicSourceHelper;
+  // basicSourceHelper.Set ("BasicEnergySourceInitialEnergyJ", DoubleValue (m_initialEnergyJ));
+  // basicSourceHelper.Set ("BasicEnergySupplyVoltageV", DoubleValue (3.3));
+  // m_sources = basicSourceHelper.Install(m_uavs.Get(0));
 
   /* device energy model */
   WifiRadioEnergyModelHelper radioEnergyHelper;
@@ -408,7 +407,7 @@ void TestBed::ConfigureScenario ()
   radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.38787878788)); // Ampere - Tx 1.28W
   radioEnergyHelper.Set ("RxCurrentA", DoubleValue (0.28484848485)); // Ampere - Rx 0.94W
   radioEnergyHelper.SetDepletionCallback (MakeCallback(&TestBed::WifiRadioEnergyDepletionCallback, this));
-  DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi.Get(0), sources);
+  DeviceEnergyModelContainer deviceModelsWifi = radioEnergyHelper.Install (wifi.Get(0), m_sources);
 
   // ADHOC -- http://www.mwnl.snu.ac.kr/~schoi/publication/Conferences/15-SECON-LEE.pdf [1 antena]
   radioEnergyHelper.Set ("IdleCurrentA", DoubleValue (0.18181818182)); // Ampere - (17dBm 40MHz) Idle 0.6W
@@ -418,14 +417,14 @@ void TestBed::ConfigureScenario ()
   radioEnergyHelper.Set ("TxCurrentA", DoubleValue (0.45454545455)); // Ampere - Tx 1.5W
   radioEnergyHelper.Set ("RxCurrentA", DoubleValue (0.25757575758)); // Ampere - Rx 0.85W
   // install device model
-  DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhocUav.Get(0), sources);
+  DeviceEnergyModelContainer deviceModelsAdhoc = radioEnergyHelper.Install (adhocUav.Get(0), m_sources);
 
   // Configure TotalEnergyConsumption
   deviceModelsAdhoc.Get(0)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&TestBed::TotalEnergyConsumptionTraceAdhoc,  this));
   deviceModelsWifi.Get(0)->TraceConnectWithoutContext ("TotalEnergyConsumption", MakeCallback(&TestBed::TotalEnergyConsumptionTrace,  this));
 
   // configure cli
-  m_cli.Create(20);
+  m_cli.Create(15);
   // configurando devices
   NetDeviceContainer dev  = wifiHelper.Install(phyHelperCli, macWifiHelperCli, m_cli);
   // configurando internet
