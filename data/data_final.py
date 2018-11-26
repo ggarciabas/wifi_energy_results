@@ -11,6 +11,67 @@ import sys
 from matplotlib import colors as mcolors
 colors = dict(mcolors.BASE_COLORS, **mcolors.CSS4_COLORS)
 
+def read_battery_wifi (main_path, teste, scenario, protocols, seeds, device):
+    teste = True
+    data = {}
+    for key, value in protocols.iteritems():
+        data[str(key)] = []
+        first = 1
+        for seed in seeds:
+            if teste:
+                print seed
+            try:
+                file = open(main_path+scenario+"/"+str(key)+"/"+str(seed)+"/consumption_atual_"+device+".txt", 'r')
+            except IOError:
+                if teste:
+                    print "ERROR"
+                return
+            i = 0
+            for line in file:
+                d_file = [float(x) for x in line.split(',')]
+                if 10 <= d_file[0] <= 80 and d_file[0]%20 == 0: # 4 valores
+                    if first:
+                        data[str(key)].append([d_file[0], d_file[1]])
+                    else:
+                        data[str(key)][i][1] = data[str(key)][i][1] + d_file[1]
+                    i = i + 1
+            if first:
+                first = 0
+
+        for i in range(0, len(data[str(key)])):
+            data[str(key)][i][1] = data[str(key)][i][1] / len(seeds)
+
+    print data
+
+    return data
+
+def grafico_bateria_wifi (main_path, teste, scenario, data, device):
+    plt.clf()
+
+    fig = plt.figure()
+    ax = fig.add_subplot(111)
+
+    for key,values in data.iteritems():
+        v = np.array(values)
+        print v[:,0]
+        plt.plot(v[:,0], v[:,1], label=str(key))
+
+
+    if device == "wifi":
+        plt.ylim([14.4,15])
+    if device == "adhoc":
+        plt.ylim([10,15])
+    plt.xlabel('Consumo (J/5s)')
+    plt.ylabel('tempo (s)')
+    plt.title(u"Comparação do consumo por tempo e protocolo")
+    plt.legend(loc='lower left')
+
+    # lgd = ax.legend(loc='upper center', bbox_to_anchor=(0.5, 1.23), fancybox=True, shadow=True, ncol=5)
+
+    plt.savefig(main_path+scenario+'/consumo_atual_'+device+'.svg')
+    plt.savefig(main_path+scenario+'/consumo_atual_'+device+'.eps')
+    plt.savefig(main_path+scenario+'/consumo_atual_'+device+'.png')
+
 def read_battery (main_path, teste, scenario, protocol, seeds, type):
     columns = ["Dispositivo", "Tempo", "Consumo (J)"]
     adhoc = []
@@ -181,23 +242,30 @@ try:
 except IOError:
     exit()
 seeds = [int(x) for x in file.readline().strip().split(',')]
-scenarios = ['teste_2', 'teste_3']
+scenarios = ['teste_1', 'teste_2', 'teste_3']
 protocols = {"OLSR":"darksalmon", "AODV":"blueviolet", "DSDV":"skyblue"}
 for scenario in scenarios:
-    df = read_consumption (main_path, teste, scenario, protocols, seeds)
-    if teste:
-        print df
-    grafico_consumption(main_path, teste, scenario, protocols, df)
+    # df = read_consumption (main_path, teste, scenario, protocols, seeds)
+    # if teste:
+    #     print df
+    # grafico_consumption(main_path, teste, scenario, protocols, df)
+    #
+    # df = read_pacote (main_path, teste, scenario, protocols, seeds)
+    # if teste:
+    #     print df
+    # grafico_pacote(main_path, teste, scenario, protocols, df)
 
-    df = read_pacote (main_path, teste, scenario, protocols, seeds)
-    if teste:
-        print df
-    grafico_pacote(main_path, teste, scenario, protocols, df)
-
-    for key, value in protocols.iteritems():
+    devices = ["wifi", "adhoc"]
+    for device in devices:
+        data = read_battery_wifi (main_path, teste, scenario, protocols, seeds, device)
         if teste:
-            print key
-        types = ["cresc", "atual"]
-        for type in types:
-            df = read_battery (main_path, teste, scenario, key, seeds, type)
-            grafico_bateria (main_path, teste, scenario, key, type, df)
+            print data
+        grafico_bateria_wifi(main_path, teste, scenario, data, device)
+
+    # for key, value in protocols.iteritems():
+    #     if teste:
+    #         print key
+    #     types = ["cresc", "atual"]
+    #     for type in types:
+    #         df = read_battery (main_path, teste, scenario, key, seeds, type)
+    #         grafico_bateria (main_path, teste, scenario, key, type, df)
