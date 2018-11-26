@@ -181,7 +181,7 @@ try:
 except IOError:
     exit()
 seeds = [int(x) for x in file.readline().strip().split(',')]
-scenarios = ['teste_1'] #, 'teste_2', 'teste_3']
+scenarios = ['teste_2', 'teste_3']
 protocols = {"OLSR":"darksalmon", "AODV":"blueviolet", "DSDV":"skyblue"}
 for scenario in scenarios:
     df = read_consumption (main_path, teste, scenario, protocols, seeds)
