@@ -61,8 +61,8 @@ def grafico_bateria_wifi (main_path, teste, scenario, data, device):
         plt.ylim([14.4,15])
     if device == "adhoc":
         plt.ylim([10,15])
-    plt.xlabel('Consumo (J/5s)')
-    plt.ylabel('tempo (s)')
+    plt.ylabel('Consumo (J/5s)')
+    plt.xlabel('Tempo (s)')
     plt.title(u"Comparação do consumo por tempo e protocolo")
     plt.legend(loc='lower left')
 
